@@ -1,5 +1,7 @@
 package com.example.springbootdemo01.service.impl;
 
+import com.example.springbootdemo01.bean.Course;
+import com.example.springbootdemo01.bean.CourseType;
 import com.example.springbootdemo01.common.RedisCache;
 import com.example.springbootdemo01.repository.CourseRepository;
 import com.example.springbootdemo01.service.ICourseService;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -40,4 +43,17 @@ public class CourseServiceImpl implements ICourseService {
         Set<String> allStudy = courseRepository.findAllStudy(userId);
         return allStudy;
     }
+
+    @Override
+    public List<Course> findFreeCourse() {
+
+        return courseRepository.findFreeCourse();
+    }
+
+    @Override
+    public List<Course> findWarCourse() {
+        return courseRepository.findWarCourse();
+    }
+
+
 }

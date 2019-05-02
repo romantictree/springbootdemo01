@@ -1,5 +1,6 @@
 package com.example.springbootdemo01.bean;
 
+import com.example.springbootdemo01.utils.SessionUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -16,9 +17,7 @@ import java.util.Set;
  **/
 @Entity
 @Table(name="t_user")
-public class User implements Serializable {
-
-    private static final long serialVersionUID = -4234784897905851389L;
+public class User implements SessionUser {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -55,6 +54,9 @@ public class User implements Serializable {
     @Column(name="birthday")
     private Date birthday;
 
+    @Column(name="image")
+    private String image;     //头像
+
     @OneToMany(mappedBy = "user")
     private Set<Evaluate> evaluates = new HashSet<>();
 
@@ -78,6 +80,11 @@ public class User implements Serializable {
 
     public Long getUserId() {
         return userId;
+    }
+
+    @Override
+    public Set<String> getPermissions() {
+        return null;
     }
 
     public void setUserId(Long userId) {
@@ -210,5 +217,13 @@ public class User implements Serializable {
 
     public void setEvaluates(Set<Evaluate> evaluates) {
         this.evaluates = evaluates;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

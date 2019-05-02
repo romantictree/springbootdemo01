@@ -28,8 +28,8 @@ public class QiniuWrapper {
 	
 	private static final String CONFIG_BUCKET="qiniu.bucket";
 	
-	private static final String CONFIG_AK="qiniu.accesskey";
-	private static final String CONFIG_SK="qiniu.secretkey";
+	private static final String CONFIG_AK="qiniu.AccessKey";
+	private static final String CONFIG_SK="qiniu.SecretKey";
 	private static final String CONFIG_CDN="qiniu.cdns";
 	
 	private static final Auth auth;

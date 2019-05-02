@@ -5,8 +5,9 @@ import com.example.springbootdemo01.bean.dto.UserDTO;
 import com.example.springbootdemo01.repository.UserRepository;
 import com.example.springbootdemo01.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -14,27 +15,31 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Override
-    public User login(UserDTO userDTO) {
-        User userLogin = userRepository.findUserByUsername(userDTO.getUsername());
-        if(userLogin!=null&&bCryptPasswordEncoder.matches(userDTO.getPassword(),userLogin.getPassword())){
-            return userLogin;
-        }
-        return null;
+    public List<User> findAllUser() {
+        List<User> userList = userRepository.findAll();
+        return userList;
     }
 
     @Override
-    public User register(User user){
-        if(user.getUsername()!=null&&user.getPassword()!=null){
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
-        }
-        else {
-            user=null;
-        }
-        return user;
+    public List<User> findUserWithCourse() {
+        return userRepository.findUserWithCourse();
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    public User findUserByUsernameAndPassword(User user) {
+        return userRepository.findUserByUsernameAndPassword(user.getUsername(),user.getPassword());
+    }
+
+    @Override
+    public void createSelectivity(User user) {
+        userRepository.createSelectivity(user.getUsername(),user.getPassword());
+    }
+
+
 }

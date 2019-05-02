@@ -47,6 +47,9 @@ public class Course implements Serializable {
     @Column(name="chick")
     private int chick;    //点击次数
 
+    @Column(name="level")
+    private int level;
+
     public Long getCourseId() {
         return courseId;
     }
@@ -117,5 +120,13 @@ public class Course implements Serializable {
 
     public void setChick(int chick) {
         this.chick = chick;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

@@ -3,8 +3,17 @@ package com.example.springbootdemo01.service;
 import com.example.springbootdemo01.bean.User;
 import com.example.springbootdemo01.bean.dto.UserDTO;
 
-public interface IUserService {
-    public User login(UserDTO userDTO);
+import java.util.List;
 
-    public User register(User user);
+public interface IUserService {
+
+    public List<User> findAllUser();
+
+    public List<User> findUserWithCourse();
+
+    public User findByUsername(String username);
+
+    public User findUserByUsernameAndPassword(User user);
+
+    public void createSelectivity(User user);
 }

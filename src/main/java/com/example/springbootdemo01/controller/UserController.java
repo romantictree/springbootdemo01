@@ -1,16 +1,20 @@
 package com.example.springbootdemo01.controller;
 
 import com.example.springbootdemo01.bean.User;
-import com.example.springbootdemo01.bean.dto.UserDTO;
-import com.example.springbootdemo01.common.Result;
-import com.example.springbootdemo01.common.StatusCode;
+import com.example.springbootdemo01.common.JsonView;
 import com.example.springbootdemo01.service.IUserService;
-import com.example.springbootdemo01.utils.JwtUtil;
+import com.example.springbootdemo01.utils.EncryptUtil;
+import com.example.springbootdemo01.utils.SessionContext;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/user")
@@ -19,32 +23,78 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @PostMapping("/login")
-    public Result login(@RequestBody UserDTO userDTO){
-        User userLogin = userService.login(userDTO);
-        if(userLogin==null){
-            return new Result(false, StatusCode.LOGINERROR,"登录失败");
+    /**
+     * 登录页面
+     */
+    @RequestMapping(value = "/login")
+    public  ModelAndView login(){
+        if(SessionContext.isLogin()){
+            return new ModelAndView("redirect:templates/index.ftl");
         }
-        String token = jwtUtil.createJWT(userLogin.getUserId().toString(),userLogin.getUsername(),"vip");
-        Map<String,Object> map = new HashMap<>();
-        map.put("token",token);
-        map.put("role","vip");
-        return new Result(true,StatusCode.OK,"登录成功",map);
+        return new ModelAndView("auth/login");
     }
 
+    @RequestMapping(value = "/doLogin")
+    public ModelAndView doLogin(User user, String identiryCode, HttpServletRequest request){
 
-    @PostMapping("/register")
-    public Result register(@RequestBody User user){
-        try{
-            User userRegister = userService.register(user);
-            return new Result(true,StatusCode.OK,"注册成功");
-        }catch(Exception e) {
-            return new Result(false,StatusCode.ERROR,"注册失败");
+        //如果已经登录过
+        if(SessionContext.getAuthUser() != null){
+            return new ModelAndView("redirect:/");
         }
 
+        //验证码判断
+//        if(identiryCode!=null && !identiryCode.equalsIgnoreCase(SessionContext.getIdentifyCode(request))){
+//            ModelAndView mv = new ModelAndView("auth/login");
+//            mv.addObject("errcode", 1);
+//            return mv;
+//        }
+        UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), EncryptUtil.encodedByMD5(user.getPassword()));
+        try {
+            Subject currentUser = SecurityUtils.getSubject();
+            currentUser.login(token);//shiro实现登录
+            return new ModelAndView("redirect:/");
+        }catch(AuthenticationException e){ //登录失败
+            ModelAndView mv = new ModelAndView("/user/login");
+            mv.addObject("errcode", 2);
+            return mv;
+        }
     }
 
+    /**
+     * 注册页面
+     */
+    @RequestMapping(value = "/register")
+    public  ModelAndView register(){
+        if(SessionContext.isLogin()){
+            return new ModelAndView("redirect:/index.ftl");
+        }
+        return new ModelAndView("auth/register");
+    }
+
+    /**
+     * 实现注册
+     */
+    @RequestMapping(value = "/doRegister")
+    @ResponseBody
+    public String doRegister(User authUser, String identiryCode, HttpServletRequest request) {
+        //验证码判断
+//        if(identiryCode!=null && !identiryCode.equalsIgnoreCase(SessionContext.getIdentifyCode(request))){
+//            return JsonView.render(2);
+//        }
+
+        User tmpUser = userService.findByUsername(authUser.getUsername());
+        if(tmpUser != null){
+            return JsonView.render(1);
+        }else{
+            authUser.setPassword(EncryptUtil.encodedByMD5(authUser.getPassword()));
+            userService.createSelectivity(authUser);
+            return JsonView.render(0);
+        }
+    }
+
+    @RequestMapping(value = "/logout")
+    public ModelAndView logout(HttpServletRequest request) {
+        SessionContext.shiroLogout();
+        return new ModelAndView("redirect:/");
+    }
 }
