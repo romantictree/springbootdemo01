@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * Created by Administrator on 2018/4/11.
  */
-@ConfigurationProperties("jwt.config")
+//@ConfigurationProperties("jwt.config")
 public class JwtUtil {
 
     private String key ;
@@ -72,6 +72,8 @@ public class JwtUtil {
      * jwt配置时间
      *
      */
-    public void testTTL(int ttl){}
+    public void testTTL(int ttl){
+        return;
+    }
 }
 
