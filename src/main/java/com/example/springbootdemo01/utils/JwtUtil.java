@@ -72,8 +72,8 @@ public class JwtUtil {
      * jwt配置时间
      *
      */
-    public void testTTL(int ttl){
-        return;
+    public int testTTL(int ttl){
+        return -1;
     }
 }
 
