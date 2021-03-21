@@ -68,5 +68,10 @@ public class JwtUtil {
                 .getBody();
     }
 
+    /**
+     * jwt配置时间
+     *
+     */
+    public void testTTL(int ttl){}
 }
 
